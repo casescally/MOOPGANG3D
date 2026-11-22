@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 
 /* =========================================================
    MOOP GANG
@@ -78,6 +79,120 @@ renderer.toneMappingExposure = 1.15;
 
 container.appendChild(renderer.domElement);
 
+
+// ===================================
+// FIRST PERSON CONTROLS
+// ===================================
+
+const controls = new PointerLockControls(
+    camera,
+    renderer.domElement
+);
+
+
+
+// Starting camera height
+camera.position.y = 1.65;
+
+// Movement settings
+const movement = {
+    forward: false,
+    backward: false,
+    left: false,
+    right: false,
+    sprint: false
+};
+
+const WALK_SPEED = 4;
+const SPRINT_SPEED = 8;
+
+// Room boundaries - adjust to fit your room
+const ROOM_LIMIT_X = 8;
+const ROOM_LIMIT_Z = 8;
+
+// Lock mouse when clicking the scene
+const explorePrompt = document.getElementById('explore-prompt');
+
+explorePrompt.addEventListener('click', () => {
+    console.log('Explore clicked');
+
+    controls.lock();
+});
+
+controls.addEventListener('lock', () => {
+    console.log('Pointer locked!');
+});
+
+controls.addEventListener('unlock', () => {
+    console.log('Pointer unlocked!');
+});
+
+controls.addEventListener('lock', () => {
+    explorePrompt.classList.add('hidden');
+});
+
+controls.addEventListener('unlock', () => {
+    explorePrompt.classList.remove('hidden');
+});
+
+// Keyboard input
+document.addEventListener('keydown', (event) => {
+    switch (event.code) {
+        case 'KeyW':
+        case 'ArrowUp':
+            movement.forward = true;
+            break;
+
+        case 'KeyS':
+        case 'ArrowDown':
+            movement.backward = true;
+            break;
+
+        case 'KeyA':
+        case 'ArrowLeft':
+            movement.left = true;
+            break;
+
+        case 'KeyD':
+        case 'ArrowRight':
+            movement.right = true;
+            break;
+
+        case 'ShiftLeft':
+        case 'ShiftRight':
+            movement.sprint = true;
+            break;
+    }
+});
+
+document.addEventListener('keyup', (event) => {
+    switch (event.code) {
+        case 'KeyW':
+        case 'ArrowUp':
+            movement.forward = false;
+            break;
+
+        case 'KeyS':
+        case 'ArrowDown':
+            movement.backward = false;
+            break;
+
+        case 'KeyA':
+        case 'ArrowLeft':
+            movement.left = false;
+            break;
+
+        case 'KeyD':
+        case 'ArrowRight':
+            movement.right = false;
+            break;
+
+        case 'ShiftLeft':
+        case 'ShiftRight':
+            movement.sprint = false;
+            break;
+    }
+});
 
 /* =========================================================
    05. GLOBAL VARIABLES
@@ -508,11 +623,7 @@ function buildIndustrialDetails() {
    11. PROCEDURAL WALL GRAFFITI
    ========================================================= */
 
-function createGraffitiTexture(
-    title,
-    subtitle,
-    color
-) {
+function createGraffitiTexture(title, subtitle, color) {
 
     const canvas = document.createElement('canvas');
 
@@ -522,35 +633,46 @@ function createGraffitiTexture(
     const ctx = canvas.getContext('2d');
 
     ctx.fillStyle = '#080b08';
-
     ctx.fillRect(0, 0, 512, 256);
 
     ctx.globalAlpha = 0.9;
 
     ctx.strokeStyle = color;
-
     ctx.lineWidth = 8;
-
     ctx.strokeRect(15, 15, 482, 226);
 
+    // TITLE TEXT - automatically scales to fit
     ctx.fillStyle = color;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
 
-    ctx.font = '900 72px sans-serif';
+    const maxWidth = 420;
+    const maxHeight = 100;
 
-    ctx.fillText(title, 35, 125);
+    let fontSize = 72;
 
+    do {
+        ctx.font = `900 ${fontSize}px sans-serif`;
+        fontSize--;
+    } while (
+        ctx.measureText(title).width > maxWidth &&
+        fontSize > 10
+    );
+
+    ctx.fillText(title, 256, 115);
+
+    // SUBTITLE
     ctx.fillStyle = '#eeeeee';
-
     ctx.font = 'bold 19px monospace';
+    ctx.textAlign = 'center';
 
-    ctx.fillText(subtitle, 40, 180);
+    ctx.fillText(subtitle, 256, 180, 440);
 
     const texture = new THREE.CanvasTexture(canvas);
 
     texture.colorSpace = THREE.SRGBColorSpace;
 
     return texture;
-
 }
 
 
@@ -1364,19 +1486,46 @@ function animate() {
 
     requestAnimationFrame(animate);
 
-    const elapsed = clock.getElapsedTime();
 
+    const delta = Math.min(clock.getDelta(), 0.05);
+    const elapsed = clock.elapsedTime;
 
-    // Camera parallax
+if (controls.isLocked) {
 
-    camera.position.x +=
-        (mouseX - camera.position.x) * 0.025;
+    const speed = movement.sprint ? SPRINT_SPEED : WALK_SPEED;
 
-    camera.position.y +=
-        (2.4 + mouseY - camera.position.y) * 0.025;
+    if (movement.forward) {
+        controls.moveForward(speed * delta);
+    }
 
-    camera.lookAt(0, 2, -3);
+    if (movement.backward) {
+        controls.moveForward(-speed * delta);
+    }
 
+    if (movement.left) {
+        controls.moveRight(-speed * delta);
+    }
+
+    if (movement.right) {
+        controls.moveRight(speed * delta);
+    }
+
+    // Keep the player inside the room
+    camera.position.x = THREE.MathUtils.clamp(
+        camera.position.x,
+        -ROOM_LIMIT_X,
+        ROOM_LIMIT_X
+    );
+
+    camera.position.z = THREE.MathUtils.clamp(
+        camera.position.z,
+        -ROOM_LIMIT_Z,
+        ROOM_LIMIT_Z
+    );
+
+    // Keep the camera at eye level
+    camera.position.y = 1.65;
+}
 
     // Green light flicker
 
@@ -1465,6 +1614,17 @@ function initializeWorld() {
 
 }
 
+console.log('MAIN JS IS RUNNING');
+
+const testPrompt = document.getElementById('explore-prompt');
+
+console.log('EXPLORE PROMPT:', testPrompt);
+
+if (testPrompt) {
+    testPrompt.addEventListener('click', () => {
+        console.log('PROMPT CLICK REGISTERED');
+    });
+}
 
 initializeWorld();
 
