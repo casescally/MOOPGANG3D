@@ -1,21 +1,136 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MOOP GANG</title>
-    <link rel="stylesheet" href="style.css">
+
+    <title>MOOP GANG // Underground</title>
+
+    <meta name="theme-color" content="#080a08">
+
+    <link rel="stylesheet" href="./style.css">
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+  }
+}
+</script>
+
+
 </head>
+
 <body>
-    <div id="overlay">
-        <div class="logo">MOOP GANG</div>
-        <div class="subtitle">WELCOME TO THE VOID</div>
-        <div class="hint">CLICK & DRAG TO ROTATE</div>
+
+    <!-- THREE.JS ENVIRONMENT -->
+    <main id="world">
+        <div id="scene-container"></div>
+    </main>
+
+    <!-- INTERFACE -->
+    <div id="interface">
+
+        <header class="top-bar">
+
+            <a href="#" class="logo">
+                MOOP<span>_</span>GANG
+            </a>
+
+            <div class="system-status">
+                <span class="status-light"></span>
+                UNDERGROUND NETWORK // ONLINE
+            </div>
+
+        </header>
+
+        <!-- INTRO TEXT -->
+        <section class="intro">
+
+            <div class="eyebrow">
+                YOU FOUND THE PLACE
+            </div>
+
+            <h1>
+                WELCOME<br>
+                <span>TO THE</span><br>
+                DUMP.
+            </h1>
+
+            <p>
+                An unofficial headquarters for
+                officially questionable activity.
+            </p>
+
+            <div class="interaction-hint">
+                <span>CLICK</span>
+                THE CRT MONITOR TO EXPLORE
+            </div>
+
+        </section>
+
+        <footer class="bottom-bar">
+
+            <div>MG-001 // EST. IN THE DEPTHS</div>
+
+            <div class="camera-hint">
+                MOVE MOUSE TO LOOK AROUND
+            </div>
+
+        </footer>
+
     </div>
 
-    <canvas id="webgl"></canvas>
+    <!-- ARCHIVE INTERACTION -->
+    <section id="archive-panel" class="hidden">
 
-    <script type="module" src="main.js"></script>
+        <button id="close-archive" class="close-button">
+            ×
+        </button>
+
+        <div class="eyebrow">
+            MOOP GANG // SIGNAL FOUND
+        </div>
+
+        <h2>THE ARCHIVE</h2>
+
+        <p>
+            You've reached the Moop Gang video terminal.
+            The signal is coming through.
+        </p>
+
+        <div class="connection-status">
+            <span class="status-light"></span>
+            CONNECTION ESTABLISHED
+        </div>
+
+        <button id="return-button">
+            RETURN TO THE ROOM
+        </button>
+
+    </section>
+
+    <!-- LOADING SCREEN -->
+    <div id="loading-screen">
+
+        <div class="loading-logo">
+            MOOP<span>_</span>GANG
+        </div>
+
+        <div class="loading-text">
+            INITIALIZING UNDERGROUND NETWORK
+        </div>
+
+        <div class="loading-bar">
+            <div></div>
+        </div>
+
+    </div>
+
+    <!-- MAIN JAVASCRIPT -->
+    <script type="module" src="./main.js"></script>
+
 </body>
 </html>
+

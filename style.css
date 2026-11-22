@@ -1,65 +1,339 @@
 
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root {
+    --green: #a6ff35;
+    --pink: #ff2ca8;
+    --blue: #37cfff;
+    --black: #080a08;
+    --white: #e9eddf;
+}
+
 * {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
 }
 
+html,
 body {
+    width: 100%;
+    height: 100%;
     overflow: hidden;
-    background: #050505;
-    font-family: Arial, Helvetica, sans-serif;
-    color: #b6ff00;
+    background: var(--black);
+    color: var(--white);
+    font-family: 'IBM Plex Mono', monospace;
 }
 
-#webgl {
+/* THREE.JS WORLD */
+
+#world,
+#scene-container {
     position: fixed;
     inset: 0;
     width: 100%;
     height: 100%;
-    display: block;
 }
 
-#overlay {
-    position: fixed;
-    z-index: 2;
-    top: 0;
-    left: 0;
+#scene-container canvas {
+    display: block;
     width: 100%;
-    padding: 40px;
+    height: 100%;
+}
+
+/* INTERFACE */
+
+#interface {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
     pointer-events: none;
 }
 
-.logo {
-    font-size: clamp(40px, 8vw, 110px);
-    font-weight: 900;
-    letter-spacing: -0.08em;
-    line-height: 0.9;
-    text-shadow: 0 0 20px #b6ff0044;
-}
+/* HEADER */
 
-.subtitle {
-    margin-top: 16px;
-    font-size: 12px;
-    letter-spacing: 0.4em;
-}
-
-.hint {
+.top-bar {
     position: absolute;
-    top: 50vh;
-    width: calc(100% - 80px);
-    text-align: center;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 30px 40px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    color: var(--white);
+    text-decoration: none;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 29px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    pointer-events: auto;
+}
+
+.logo span,
+.loading-logo span {
+    color: var(--green);
+}
+
+.system-status {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: #a0a797;
+}
+
+.status-light {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 12px var(--green);
+    margin-right: 8px;
+}
+
+/* INTRO */
+
+.intro {
+    position: absolute;
+    left: 8%;
+    top: 50%;
+    transform: translateY(-42%);
+
+    max-width: 500px;
+
+    text-shadow: 0 3px 25px #000;
+}
+
+.eyebrow {
+    color: var(--green);
+    font-size: 10px;
+    letter-spacing: 3px;
+    margin-bottom: 20px;
+}
+
+.intro h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(75px, 10vw, 135px);
+    font-weight: 900;
+    line-height: 0.76;
+    letter-spacing: -4px;
+}
+
+.intro h1 span {
+    color: var(--green);
+}
+
+.intro p {
+    margin-top: 30px;
+    max-width: 310px;
     font-size: 11px;
-    letter-spacing: 0.25em;
-    opacity: 0.5;
+    line-height: 1.8;
+    color: #c1c7b9;
 }
 
-@media (max-width: 600px) {
-    #overlay {
-        padding: 24px;
-    }
+.interaction-hint {
+    margin-top: 30px;
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: #aab19e;
+}
 
-    .hint {
-        width: calc(100% - 48px);
+.interaction-hint span {
+    display: inline-block;
+    padding: 8px 10px;
+    margin-right: 8px;
+    color: var(--green);
+    border: 1px solid #a6ff3580;
+}
+
+/* FOOTER */
+
+.bottom-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 30px 40px;
+
+    display: flex;
+    justify-content: space-between;
+
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: #838b7c;
+}
+
+/* ARCHIVE PANEL */
+
+#archive-panel {
+    position: fixed;
+    z-index: 5;
+
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    width: min(520px, calc(100% - 40px));
+
+    padding: 40px;
+
+    background: rgba(7, 12, 7, 0.96);
+    border: 1px solid #a6ff3580;
+
+    box-shadow:
+        0 0 80px #000,
+        0 0 40px #a6ff3520;
+}
+
+#archive-panel.hidden {
+    display: none;
+}
+
+#archive-panel h2 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 65px;
+    color: var(--green);
+}
+
+#archive-panel p {
+    margin-top: 15px;
+    font-size: 12px;
+    line-height: 1.8;
+    color: #b8c0b1;
+}
+
+.close-button {
+    position: absolute;
+    top: 12px;
+    right: 18px;
+
+    border: none;
+    background: none;
+
+    color: white;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+.connection-status {
+    margin: 25px 0;
+    padding: 15px;
+    border: 1px solid #a6ff3530;
+
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: #a6b39a;
+}
+
+#return-button {
+    padding: 14px 20px;
+
+    background: var(--green);
+    border: none;
+
+    color: #080a08;
+
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+
+    cursor: pointer;
+}
+
+/* LOADING SCREEN */
+
+#loading-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    background: var(--black);
+
+    transition: opacity 0.8s ease;
+}
+
+#loading-screen.loaded {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.loading-logo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 65px;
+    font-weight: 900;
+    letter-spacing: 4px;
+}
+
+.loading-text {
+    margin-top: 20px;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: #929b88;
+}
+
+.loading-bar {
+    width: 180px;
+    height: 2px;
+    margin-top: 25px;
+    background: #242a21;
+    overflow: hidden;
+}
+
+.loading-bar div {
+    width: 100%;
+    height: 100%;
+    background: var(--green);
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: load 1.5s ease forwards;
+}
+
+@keyframes load {
+    to {
+        transform: scaleX(1);
     }
 }
+
+/* MOBILE */
+
+@media (max-width: 650px) {
+
+    .top-bar {
+        padding: 20px;
+    }
+
+    .system-status {
+        font-size: 7px;
+        letter-spacing: 1px;
+    }
+
+    .intro {
+        left: 22px;
+        top: 43%;
+    }
+
+    .intro h1 {
+        font-size: 85px;
+    }
+
+    .bottom-bar {
+        padding: 20px;
+        font-size: 7px;
+    }
+
+    .camera-hint {
+        display: none;
+    }
+
+}
+
