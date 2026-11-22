@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 
+
 /* =========================================================
    MOOP GANG
    UNDERGROUND ENVIRONMENT
@@ -1243,6 +1244,32 @@ function buildDust() {
 const gltfLoader = new GLTFLoader();
 
 const textureLoader = new THREE.TextureLoader();
+
+//test load//
+
+const gltfLoader1 = new GLTFLoader();
+
+gltfLoader1.load(
+    './assets/models/test-cube.glb',
+
+    (gltf) => {
+        const cube = gltf.scene;
+
+        cube.position.set(0, 1, -3);
+        cube.scale.set(1, 1, 1);
+
+        scene.add(cube);
+
+        console.log("Blender asset loaded!", cube);
+    },
+
+    undefined,
+
+    (error) => {
+        console.error("Error loading Blender asset:", error);
+    }
+);
+
 
 
 function loadModel(path, position, scale = 1) {
