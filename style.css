@@ -95,6 +95,54 @@ body {
     margin-right: 8px;
 }
 
+/*Exploration*/
+
+#explore-prompt {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.35);
+    cursor: pointer;
+    color: #aaff00;
+    font-family: 'IBM Plex Mono', monospace;
+    text-align: center;
+    transition: opacity 0.3s;
+}
+
+#explore-prompt.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.prompt-content {
+    padding: 30px;
+    border: 1px solid rgba(170, 255, 0, 0.5);
+    background: rgba(0, 0, 0, 0.8);
+    box-shadow: 0 0 30px rgba(170, 255, 0, 0.1);
+}
+
+.prompt-title {
+    font-size: 12px;
+    margin-bottom: 25px;
+    opacity: 0.6;
+}
+
+.prompt-content > div:nth-child(2) {
+    font-size: 24px;
+    letter-spacing: 4px;
+}
+
+.prompt-controls {
+    margin-top: 20px;
+    font-size: 10px;
+    opacity: 0.6;
+}
+
+
+
 /* INTRO */
 
 .intro {
@@ -337,3 +385,14 @@ body {
 
 }
 
+#explore-prompt {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 999999 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+#explore-prompt * {
+    pointer-events: none;
+}
