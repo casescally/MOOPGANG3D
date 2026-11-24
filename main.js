@@ -137,15 +137,46 @@ function createVirtualPC() {
     return overlay;
 }
 const virtualPC = createVirtualPC();
+
+// Nearby interaction prompt: appears when the player approaches the computer.
+const pcPrompt = document.createElement('div');
+pcPrompt.id = 'pc-nearby-prompt';
+pcPrompt.innerHTML = '<strong>COMPUTER DETECTED</strong><span>Click the computer to use it</span>';
+Object.assign(pcPrompt.style, {
+  position: 'fixed', left: '50%', bottom: '8vh', transform: 'translateX(-50%)',
+  zIndex: '9998', display: 'none', padding: '12px 18px',
+  background: 'rgba(8,12,8,.88)', border: '1px solid #a6ff35',
+  color: '#a6ff35', font: 'bold 13px monospace', letterSpacing: '1px',
+  textAlign: 'center', boxShadow: '0 0 22px rgba(166,255,53,.2)',
+  pointerEvents: 'none', borderRadius: '4px'
+});
+pcPrompt.innerHTML += '<br><span style="display:block;margin-top:5px;color:#ddd;font-size:11px;font-weight:normal">[ CLICK SCREEN ]</span>';
+document.body.appendChild(pcPrompt);
+const PC_PROXIMITY_DISTANCE = 2.8;
+const computerBounds = new THREE.Box3();
+function updateComputerPrompt() {
+  if (!clubhouse || !interactableMeshes.length || !controls.isLocked || pcWindowOpen) {
+    pcPrompt.style.display = 'none';
+    return;
+  }
+  let nearest = Infinity;
+  for (const mesh of interactableMeshes) {
+    computerBounds.setFromObject(mesh);
+    nearest = Math.min(nearest, computerBounds.distanceToPoint(camera.position));
+  }
+  pcPrompt.style.display = nearest <= PC_PROXIMITY_DISTANCE ? 'block' : 'none';
+}
 function openVirtualPC() {
     pcWindowOpen = true;
     controls.unlock();
     showExplorePrompt(false);
+    pcPrompt.style.display = 'none';
     virtualPC.style.display = 'flex';
 }
 function closeVirtualPC() {
     virtualPC.style.display = 'none';
     pcWindowOpen = false;
+    pcPrompt.style.display = 'none';
     showExplorePrompt(true);
 }
 window.closeVirtualPC = closeVirtualPC;
@@ -208,7 +239,7 @@ loader.load(
     const size = bounds.getSize(new THREE.Vector3());
     // Spawn toward the front opening, looking into the room. Adjust spawn offset if your
     // Blender model's entrance/front is oriented differently.
-    camera.position.set(0, Math.max(1.6, size.y * 0.27), size.z * 0.42);
+    camera.position.set(0, THREE.MathUtils.clamp(size.y * 0.38, 1.75, 3.25), size.z * 0.42);
     camera.lookAt(0, Math.max(1.5, size.y * 0.25), 0);
     console.log('[Moop Gang] Clubhouse loaded:', { size, camera: camera.position, meshes: [] });
     registerInteractables(clubhouse);
@@ -266,6 +297,7 @@ function animate() {
     camera.position.y = Math.max(1.6, camera.position.y);
   }
   greenLight.intensity = 28 + Math.sin(elapsed * 2) * 2;
+  updateComputerPrompt();
   animatedObjects.forEach(o => o.rotation.y += 0.0001);
   renderer.render(scene, camera);
 }
